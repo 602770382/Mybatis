@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lawrie.pojo">
+
+    <resultMap id="categoryBean" type="Category">
+        <id column="cid" property="id"/>
+        <result column="cname" property="name"/>
+        <!--一对多 property:集合属性的值，ofType:集合中元素的类型-->
+        <collection property="products" ofType="Product">
+            <id column="pid" property="id"/>
+            <result column="pname" property="name"/>
+            <result column="price" property="price"/>
+        </collection>
+    </resultMap>
+
+    <!--关联查询分类和产品表-->
+    <select id="listCategory" resultMap="categoryBean">
+        select c.*,p.*,c.id 'cid',p.id 'pid',c.name 'cname',p.name 'pname'
+        from category_ c left join product_ p on c.id=p.cid
+    </select>
+
+    <!--<select id="listCategory" resultType="Category">
+        SELECT * FROM category_
+    </select>-->
+
+    <select id="listCategoryByName" resultType="Category">
+        SELECT * FROM category_ WHERE name LIKE concat('%',#{0},'%')
+    </select>
+
+    <select id="listCategoryByIdAndName"  parameterType="map" resultType="Category">
+        select * from   category_  where id> #{id}  and name like concat('%',#{name},'%')
+    </select>
+
+    <select id="getCategory" parameterType="_int" resultType="Category">
+        SELECT * FROM category_ WHERE id=#{id}
+    </select>
+
+    <insert id="addCategory" parameterType="Category">
+        INSERT INTO category_(name) VALUES (#{name})
+    </insert>
+
+    <delete id="deleteCategory" parameterType="Category">
+        DELETE FROM category_  WHERE id=#{id}
+    </delete>
+
+    <update id="updateCategory" parameterType="Category">
+        UPDATE category_ SET name=#{name} WHERE id=#{id}
+    </update>
+
+</mapper>
