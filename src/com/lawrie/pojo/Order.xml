@@ -18,17 +18,22 @@
     </resultMap>
 
     <select id="listOrder" resultMap="orderBean">
-        select o.*,p.*,oi.*,o.id 'oid',p.id 'pid',oi.id 'oiid',p.name 'pname',
+        select o.*,p.*,oi.*,o.id 'oid',p.id 'pid',oi.id 'oiid',p.name 'pname'
         from order_ o
-        left join order_item_oi on o.id=oi.oid
+        left join order_item oi on o.id=oi.oid
         left join product_ p on oi.pid=p.id
     </select>
 
     <select id="getOrder" resultMap="orderBean">
         select o.*,p.*,oi.*,o.id 'oid',p.id 'pid',oi.id 'oiid',p.name 'pname'
-        from order_o
+        from order_ o
         left join order_item oi on o.id=oi.oid
         left join product_ p on oi.pid=p.id
         WHERE o.id=#{id}
     </select>
+
+    <delete id="deleteOrder">
+        DELETE FROM order_item  WHERE oid=#{id};
+        DELETE FROM order_ WHERE id=#{id};
+    </delete>
 </mapper>

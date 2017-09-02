@@ -12,7 +12,6 @@
         <result column="pname" property="name"/>
         <result column="price" property="price"/>
 
-        <!--多对一,property:属性名称，javaType:属性类型-->
         <association property="category" javaType="Category">
             <id column="cid" property="id"/>
             <result column="cname" property="name"/>
@@ -24,11 +23,9 @@
         from category_ c left join product_ p on c.id=p.cid
     </select>
 
-    <update id="updateProduct" parameterType="Product">
-        UPDATE product_ SET cid=#{category.id} WHERE id=#{id}
-    </update>
 
-    <select id="getProduct" resultType="Product">
-        SELECT * FROM product_ WHERE id=#{id}
+    <select id="getProduct" resultMap="productBean">
+        SELECT c.*,p.*,c.id 'cid',p.id 'pid',c.name 'cname',p.name 'pname'
+        FROM category_ c left join product_ p on c.id=p.cid WHERE p.id=#{id}
     </select>
 </mapper>

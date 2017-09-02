@@ -12,7 +12,8 @@
             <transactionManager type="JDBC"/>
             <dataSource type="POOLED">
                 <property name="driver" value="com.mysql.jdbc.Driver"/>
-                <property name="url" value="jdbc:mysql://localhost:3306/how2java?characterEncoding=UTF-8"/>
+                <property name="url" value=
+                        "jdbc:mysql://localhost:3306/how2java?characterEncoding=UTF-8&amp;allowMultiQueries=true"/>
                 <property name="username" value="root"/>
                 <property name="password" value="admin"/>
             </dataSource>
@@ -21,5 +22,7 @@
     <mappers>
         <mapper resource="com/lawrie/pojo/Category.xml"/>
         <mapper resource="com/lawrie/pojo/Product.xml"/>
+        <mapper resource="com/lawrie/pojo/Order.xml"/>
+        <mapper resource="com/lawrie/pojo/OrderItem.xml"/>
     </mappers>
 </configuration>
