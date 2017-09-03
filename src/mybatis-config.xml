@@ -3,19 +3,56 @@
         PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
+    <settings>
+        <!--打开延迟加载的开关-->
+        <setting name="lazyLoadingEnabled" value="true"/>
+        <!--将积极加载改为消息加载（按需加载）-->
+        <setting name="aggressiveLazyLoading" value="false"/>
+        <!--二级缓存-->
+        <setting name="cacheEnabled" value="true"/>
+    </settings>
     <!--自动扫描-->
     <typeAliases>
         <package name="com.lawrie.pojo"/>
     </typeAliases>
+    <!--开启分页插件-->
+    <plugins>
+        <plugin interceptor="com.github.pagehelper.PageInterceptor"></plugin>
+    </plugins>
     <environments default="development">
         <environment id="development">
             <transactionManager type="JDBC"/>
-            <dataSource type="POOLED">
+            <!--<dataSource type="POOLED">
                 <property name="driver" value="com.mysql.jdbc.Driver"/>
                 <property name="url" value=
                         "jdbc:mysql://localhost:3306/how2java?characterEncoding=UTF-8&amp;allowMultiQueries=true"/>
                 <property name="username" value="root"/>
                 <property name="password" value="admin"/>
+            </dataSource>-->
+            
+            <!--使用c3p0-->
+            <dataSource type="org.mybatis.c3p0.C3P0DataSourceFactory">
+                <property name="driverClass" value="com.mysql.jdbc.Driver" />
+                <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/how2java?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true&amp;failOverReadOnly=false"/>
+                <property name="user" value="root" />
+                <property name="password" value="admin" />
+                <!-- 连接池初始化大小为3 -->
+                <property name="initialPoolSize" value="3"/>
+                <!-- 连接池最大为10 -->
+                <property name="maxPoolSize" value="10"/>
+                <!-- 连接池最小为3 -->
+                <property name="minPoolSize" value="3"/>
+                <!-- 连接池在无空闲连接可用时一次性最多创建的新数据库连接数  -->
+                <property name="acquireIncrement" value="5"/>
+                <!-- 连接的最大空闲时间，如果超过这个时间（秒），某个数据库连接还没有被使用，则会断开掉这个连接。如果为0，则永远不会断开连接,即回收此连接 -->
+                <property name="maxIdleTime" value="30"/>
+
+                <!-- 最大的Statement数量 -->
+                <property name="maxStatements" value="500"/>
+                <!-- 每个连接启动的最大Statement数量 -->
+                <property name="maxStatementsPerConnection" value="50"/>
+                <!-- 同时运行的线程数 -->
+                <property name="numHelperThreads" value="5"/>
             </dataSource>
         </environment>
     </environments>
@@ -24,5 +61,10 @@
         <mapper resource="com/lawrie/pojo/Product.xml"/>
         <mapper resource="com/lawrie/pojo/Order.xml"/>
         <mapper resource="com/lawrie/pojo/OrderItem.xml"/>
+        <mapper class="com.lawrie.mapper.CategoryMapper"/>
+        <mapper class="com.lawrie.mapper.CategoryCRUDMapper"/>
+        <mapper class="com.lawrie.mapper.ProductMapper"/>
+        <mapper class="com.lawrie.mapper.OrderMapper"/>
+        <mapper class="com.lawrie.mapper.OrderItemMapper"/>
     </mappers>
 </configuration>

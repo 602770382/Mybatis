@@ -1,8 +1,9 @@
 package com.lawrie.pojo;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Category {
+public class Category implements Serializable{
     private int id;
     private String name;
     private List<Product> products;

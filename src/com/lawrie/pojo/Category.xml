@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.lawrie.pojo">
-
+    <cache/>
     <resultMap id="categoryBean" type="Category">
         <id column="cid" property="id"/>
         <result column="cname" property="name"/>
@@ -16,14 +16,21 @@
     </resultMap>
 
     <!--关联查询分类和产品表-->
-    <select id="listCategory" resultMap="categoryBean">
+    <select id="listCategoryCollection" resultMap="categoryBean">
         select c.*,p.*,c.id 'cid',p.id 'pid',c.name 'cname',p.name 'pname'
         from category_ c left join product_ p on c.id=p.cid
     </select>
 
-    <!--<select id="listCategory" resultType="Category">
+    <select id="listCategory" resultType="Category">
         SELECT * FROM category_
-    </select>-->
+    </select>
+
+    <select id="listCategoryByPage" resultType="Category">
+        SELECT * FROM category_
+        <!--<if test="start!=null and count!=null">
+            limit #{start} ,#{count}
+        </if>-->
+    </select>
 
     <select id="listCategoryByName" resultType="Category">
         SELECT * FROM category_ WHERE name LIKE concat('%',#{0},'%')

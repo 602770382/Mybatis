@@ -1,7 +1,7 @@
-import com.lawrie.pojo.Category;
-import com.lawrie.pojo.Order;
-import com.lawrie.pojo.OrderItem;
-import com.lawrie.pojo.Product;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.lawrie.mapper.*;
+import com.lawrie.pojo.*;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -20,12 +20,63 @@ public class TestMybatis {
         SqlSessionFactory sqlSessionFactory=new SqlSessionFactoryBuilder().build(inputStream);
         SqlSession session=sqlSessionFactory.openSession();
 
+        /*二级缓存test*/
+        /*
+        SqlSession session1=sqlSessionFactory.openSession();
+        Category c1 = session1.selectOne("getCategory", 1);
+        System.out.println(c1);
+        Category c2 = session1.selectOne("getCategory", 1);
+        System.out.println(c2);
 
-        session.delete("deleteOrder",1);
-        listOrder(session);
+        session1.commit();
+        session1.close();
 
-        /* 一对多test
-        List<Category>cs=session.selectList("listCategory");
+        SqlSession session2 = sqlSessionFactory.openSession();
+        Category c3 = session2.selectOne("getCategory", 1);
+        System.out.println(c3);
+        session2.commit();
+        session2.close();*/
+
+        /*分页插件*/
+        /*
+        PageHelper.offsetPage(30,10);
+        List<Category>cs=session.selectList("listCategoryByPage");
+        for(Category c:cs){
+            System.out.println(c);
+        }
+
+        PageInfo pageInfo=new PageInfo<>(cs);
+        System.out.println("总数:"+pageInfo.getTotal());
+        System.out.println(pageInfo);*/
+
+        /*tag foreach test*/
+        /*
+        List<Integer>list=new ArrayList<>();
+        list.add(14);
+        list.add(15);
+        list.add(16);
+
+        List<Product> ps2 = session.selectList("listProduct",list);
+        for (Product p : ps2) {
+            System.out.println(p);
+        }*/
+
+        /*tag if test*/
+        /*
+        List<Product> ps = session.selectList("listProduct");
+        for (Product p : ps) {
+            System.out.println(p+" 对应的分类是 \t "+ p.getCategory());
+        }
+        System.out.println("模糊查询");
+        Map<String,Object>params=new HashMap<>();
+        params.put("name","law");
+        List<Product>ps2=session.selectList("listProduct",params);
+        for(Product p:ps2){
+            System.out.println(p);
+        }*/
+
+        /*一对多test*/
+        /*List<Category>cs=session.selectList("listCategoryCollection");
         for(Category c:cs){
             System.out.println(c);
             List<Product>ps=c.getProducts();
@@ -33,7 +84,8 @@ public class TestMybatis {
                 System.out.println("\t"+p);
         }*/
 
-        /* 多条件查询
+        /*多条件查询*/
+        /*
         Map<String,Object>params=new HashMap<>();
         params.put("id",1);
         params.put("name","本");
@@ -48,7 +100,40 @@ public class TestMybatis {
         session.close();
     }
 
-    private static void listAll(SqlSession session) {
+
+
+    private static void ManyToOne(ProductMapper mapper){
+        List<Product>list=mapper.list();
+        for(Product p:list){
+            System.out.print(p.getName());
+            Category c=p.getCategory();
+            System.out.println("\t"+c.getName());
+        }
+    }
+
+    private static void OneToMany(CategoryMapper mapper){
+        List<Category>list=mapper.list();
+        for(Category c:list){
+            System.out.println(c.getName());
+            List<Product>pl=c.getProducts();
+            for(Product p:pl){
+                System.out.println("\t"+p.getName());
+            }
+        }
+    }
+
+    private static void listAllProduct(SqlSession session) {
+        Map<String,Object> params = new HashMap<>();
+//        params.put("name","a");
+//        params.put("price","10");
+        List<Product> ps2 = session.selectList("listProduct",params);
+        for (Product p : ps2) {
+            System.out.println(p);
+        }
+    }
+
+
+    private static void listAllCategory(SqlSession session) {
         List<Category> cs = session.selectList("listCategory");
         for (Category c : cs) {
             System.out.println(c.getName());
@@ -57,7 +142,8 @@ public class TestMybatis {
 
     //多对多test
     private static void listOrder(SqlSession session){
-        List<Order>os=session.selectList("listOrder");
+        OrderMapper mapper=session.getMapper(OrderMapper.class);
+        List<Order>os=mapper.list();
         for(Order o:os){
             System.out.println(o.getCode());
             List<OrderItem>ois=o.getOrderItems();
@@ -85,6 +171,32 @@ public class TestMybatis {
         oi.setProduct(p1);
         oi.setNumber(200);
         session.delete("deleteOrderItem",oi);
+    }
+
+    private static void addCategory(CategoryCRUDMapper mapper){
+        Category c=new Category();
+        c.setName("category3");
+        mapper.add(c);
+        listAllCategoryByAnnotation(mapper);
+    }
+
+    private static void deleteCategory(CategoryCRUDMapper mapper){
+        mapper.delete(4);
+        listAllCategoryByAnnotation(mapper);
+    }
+
+    private static void udpateCategory(CategoryCRUDMapper mapper){
+        Category c=mapper.get(2);
+        c.setName("category2");
+        mapper.udpate(c);
+        listAllCategoryByAnnotation(mapper);
+    }
+
+    private static void listAllCategoryByAnnotation(CategoryCRUDMapper mapper){
+        List<Category> cs=mapper.list();
+        for(Category c:cs){
+            System.out.println(c);
+        }
     }
 
 }

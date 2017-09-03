@@ -3,9 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.lawrie.pojo">
-    <!--<select id="listProduct" resultType="Product">
-        SELECT * FROM product_
-    </select>-->
+
 
     <resultMap id="productBean" type="Product">
         <id column="pid" property="id"/>
@@ -18,11 +16,58 @@
         </association>
     </resultMap>
 
-    <select id="listProduct" resultMap="productBean">
+    <select id="listProductAssociated" resultMap="productBean">
         select c.*,p.*,c.id 'cid',p.id 'pid',c.name 'cname',p.name 'pname'
         from category_ c left join product_ p on c.id=p.cid
     </select>
 
+    <select id="listProduct" resultType="Product">
+        SELECT * FROM product_
+            <!-- foreach 标签
+                WHERE ID IN
+                <foreach item="item" index="index" collection="list"
+                open="(" separator="," close=")">
+                    #{item}
+                </foreach>-->
+        <!--<where>标签会进行自动判断，
+        如果任何条件都不成立，那么sql语句中就不会出现where
+        如果有任何条件成立，会自动去掉多出来的And或or-->
+        <where>
+            <if test="name!=null">
+                AND name LIKE concat('%',#{name},'%')
+            </if>
+            <if test="price!=null and price!=0">
+                AND price>#{price}
+            </if>
+        </where>
+        <!-- when otherwise 标签-->
+        <where>
+            <choose>
+                <when test="name!=null">
+                    AND name LIKE concat('%',#{name,'%')
+                </when>
+                <when test="price!=null and price>0">
+                    AND price > #{price}
+                </when>
+                <otherwise>
+                    AND id>1
+                </otherwise>
+            </choose>
+        </where>
+    </select>
+
+    <select id="listProductByName" parameterType="string" resultType="Product">
+        <bind name="likename" value="'%'+name+'%'"/>
+            SELECT * FROM product_ WHERE name LIKE #{likename}
+    </select>
+
+    <update id="updateProduct" parameterType="Product">
+        UPDATE product_
+        <set>
+            <if test="name!=null">name=#{name}</if>
+            <if test="price!=null">price=#{price}</if>
+        </set>
+    </update>
 
     <select id="getProduct" resultMap="productBean">
         SELECT c.*,p.*,c.id 'cid',p.id 'pid',c.name 'cname',p.name 'pname'
